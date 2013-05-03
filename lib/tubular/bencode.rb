@@ -1,6 +1,18 @@
 module Tubular
   module Bencode
     class Parser
+      def parse_from_file(source)
+        return parse(source.read) if source.respond_to?(:read)
+        return File.read(source) if source.respond_to?(:to_s)
+        raise ArgumentError
+      end
+
+      def parse_from_string(string)
+        parse(StringIO.new(string))
+      end
+
+      private
+
       def parse(io)
         leader = io.getc
 
