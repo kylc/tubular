@@ -2,8 +2,8 @@ module Tubular
   module Bencode
     class Parser
       def parse_from_file(source)
-        return parse(source.read) if source.respond_to?(:read)
-        return File.read(source) if source.respond_to?(:to_s)
+        return parse(source) if source.respond_to?(:read)
+        return parse(File.open(source.to_s)) if source.respond_to?(:to_s)
         raise ArgumentError
       end
 
@@ -30,16 +30,12 @@ module Tubular
       end
 
       def parse_int(io)
-        num = io.readline('e')[0..-2].to_i
+        num = io.gets('e').chop.to_i
       end
 
       def parse_string(io)
-        length = 0
-        while (char = io.getc) != ':'
-          length = length * 10 + char.to_i
-        end
-
-        value = io.gets(length)
+        length = io.gets(':').to_i
+        value = io.read(length)
       end
 
       def parse_list(io)
