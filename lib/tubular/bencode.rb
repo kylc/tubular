@@ -1,6 +1,6 @@
 module Tubular
-  module Bencode
-    class Parser
+  class Bencode 
+    class << self
       def parse_from_file(source)
         return parse(source) if source.respond_to?(:read)
         return parse(File.open(source.to_s)) if source.respond_to?(:to_s)
