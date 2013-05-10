@@ -1,3 +1,5 @@
+require 'stringio'
+
 module Tubular
   class Bencode 
     class << self
@@ -9,6 +11,19 @@ module Tubular
 
       def parse_from_string(string)
         parse(StringIO.new(string))
+      end
+
+      def encode(val)
+        case val
+        when Fixnum
+          'i' + val.to_s + 'e'
+        when Array
+          'l' + val.map { |v| encode(v) }.join + 'e'
+        when Hash
+          'd' + val.map { |k, v| encode(k.to_s) + encode(v) }.join + 'e'
+        when String
+          val.length.to_s + ':' + val
+        end
       end
 
       private
