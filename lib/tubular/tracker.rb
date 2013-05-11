@@ -51,16 +51,12 @@ module Tubular
       end
 
       def peers
-        peers = []
-
-        body['peers'].chars.to_a.each_slice(6) do |peer|
+        body['peers'].chars.to_a.each_slice(6).map do |peer|
           ip = peer[0..3].join.unpack('CCCC').join('.')
           port = peer[4..5].join.unpack('n').first
 
-          peers << [ip, port].join(':')
+          [ip, port].join(':')
         end
-
-        peers
       end
     end
   end
