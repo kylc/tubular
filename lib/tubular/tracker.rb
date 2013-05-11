@@ -24,7 +24,7 @@ module Tubular
         @params[:info_hash] = @torrent.info_hash
       end
 
-      def request
+      def perform
         resp = Net::HTTP.get_response(request_url)
 
         Response.new(Bencode::parse_from_string(resp.body))
