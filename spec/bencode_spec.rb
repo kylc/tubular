@@ -1,7 +1,4 @@
-require 'minitest/autorun'
-require 'stringio'
-
-require_relative '../lib/tubular/bencode'
+require_relative 'spec_helper'
 
 describe 'Tubular::Bencode' do
   it "can parse integers" do
