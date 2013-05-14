@@ -19,6 +19,6 @@ describe 'Tubular::Tracker' do
 
     resp = subject.perform
     resp.success?.must_equal true
-    resp.peers.must_equal ["185.21.216.135:52279", "94.181.186.44:39778"]
+    resp.peers.must_equal [{ :host => "185.21.216.135", :port => 52279 },                            { :host => "94.181.186.44", :port => 39778 }]
   end
 end

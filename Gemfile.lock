@@ -2,8 +2,15 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.4)
+    celluloid (0.14.1)
+      timers (>= 1.0.0)
+    celluloid-io (0.14.1)
+      celluloid (>= 0.14.1)
+      nio4r (>= 0.4.5)
     crack (0.3.2)
     minitest (5.0.0)
+    nio4r (0.4.6)
+    timers (1.1.0)
     webmock (1.11.0)
       addressable (>= 2.2.7)
       crack (>= 0.3.2)
@@ -12,5 +19,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  celluloid
+  celluloid-io
   minitest
   webmock

@@ -6,7 +6,7 @@ module Tubular
     class Tracker
       DEFAULT_PARAMS = {
           info_hash: nil,
-          peer_id: "aaaaaaaaaaaaaaaaaaaa",
+          peer_id: nil,
           ip: "0.0.0.0",
           port: 5555,
           uploaded: 0,
@@ -18,10 +18,11 @@ module Tubular
 
       attr_reader :torrent, :params
 
-      def initialize(torrent, params={})
-        @torrent = torrent
+      def initialize(environment, params={})
+        @environment = environment
         @params = DEFAULT_PARAMS.merge(params)
-        @params[:info_hash] = @torrent.info_hash
+        @params[:peer_id] = environment[:peer_id]
+        @params[:info_hash] = environment[:torrent].info_hash
       end
 
       def perform
@@ -33,7 +34,7 @@ module Tubular
       private
 
       def request_url
-        url = URI(@torrent['announce'])
+        url = URI(@environment[:torrent]['announce'])
         url.query = URI.encode_www_form(@params)
         url
       end
@@ -52,10 +53,10 @@ module Tubular
 
       def peers
         body['peers'].chars.to_a.each_slice(6).map do |peer|
-          ip = peer[0..3].join.unpack('CCCC').join('.')
+          host = peer[0..3].join.unpack('CCCC').join('.')
           port = peer[4..5].join.unpack('n').first
 
-          [ip, port].join(':')
+          { :host => host , :port => port }
         end
       end
     end
