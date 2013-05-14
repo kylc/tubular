@@ -27,6 +27,9 @@ module Tubular
       conn = Peer.new(peer[:host], peer[:port], environment)
       conn.async.connect
     end
+
+    # Sleep forever!
+    sleep
   end
 end
 
