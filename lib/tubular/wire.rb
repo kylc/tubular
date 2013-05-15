@@ -17,9 +17,9 @@ module Tubular
     def recv_handshake
       pstrlen = @socket.readbyte
       pstr = @socket.read pstrlen
-      reserved = @socket.read 8
+      reserved = @socket.read(8)
       info_hash = @socket.read(20)
-      peer_id = @socket.read 20
+      peer_id = @socket.read(20)
 
       Message.new :handshake, pstr: pstr, reserved: reserved,
         info_hash: info_hash, peer_id: peer_id
