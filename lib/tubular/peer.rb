@@ -22,7 +22,8 @@ module Tubular
 
       loop do
         message = recv_message
-        p message
+
+        Tubular.logger.debug "Message: #{message}"
       end
     end
   end

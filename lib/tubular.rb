@@ -1,9 +1,15 @@
+require 'logger'
+
 require_relative 'tubular/bencode'
 require_relative 'tubular/torrent'
 require_relative 'tubular/tracker'
 require_relative 'tubular/peer'
 
 module Tubular
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
+  end
+
   def self.download(torrent_file)
     # Open the torrent file
     torrent = Torrent.open(torrent_file)
@@ -21,8 +27,8 @@ module Tubular
 
     # Connect to the peers
     # TODO: Should select peers in a more intelligent manner
-    resp.peers.take(10).each do |peer|
-      puts "Connecting to #{peer}"
+    resp.peers.take(2).each do |peer|
+      logger.debug "Connecting to #{peer}"
 
       conn = Peer.new(peer[:host], peer[:port], environment)
       conn.async.connect
