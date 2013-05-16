@@ -3,6 +3,27 @@ module Tubular
     class Message < Struct.new(:type, :payload)
     end
 
+    class Bitfield
+      attr_reader :length
+
+      def initialize(data)
+        @data = data.unpack('C*')
+        @length = data.length * 8
+      end
+
+      def [](position)
+        @data[position / 8] & (128 >> (position % 8)) > 0
+      end
+
+      def []=(position, val)
+        if val
+          @data[position / 8] |= (128 >> (position % 8))
+        else
+          @data[position / 8] ^= (128 >> (position % 8))
+        end
+      end
+    end
+
     def send_handshake
       out = []
       out << 19
@@ -48,7 +69,7 @@ module Tubular
         when 4
           Message.new :have, piece_index: w32
         when 5
-          Message.new :bitfield, bitfield: read(len - 1)
+          Message.new :bitfield, bitfield: Bitfield.new(read(len - 1))
         when 6
           Message.new :request, index: w32, begin: w32, length: w32
         when 7
@@ -68,7 +89,7 @@ module Tubular
     end
 
     def w32
-      @socket.read(4).unpack('N')
+      @socket.read(4).unpack('N')[0]
     end
   end
 end
