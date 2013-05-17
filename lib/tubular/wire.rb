@@ -1,61 +1,83 @@
+require_relative 'bitfield' 
+require_relative 'buffer' 
+
 module Tubular
   module Wire
     class Message < Struct.new(:type, :payload)
     end
 
-    class Bitfield
-      attr_reader :length
-
-      def initialize(data)
-        @data = data.unpack('C*')
-        @length = data.length * 8
-      end
-
-      def [](position)
-        @data[position / 8] & (128 >> (position % 8)) > 0
-      end
-
-      def []=(position, val)
-        if val
-          @data[position / 8] |= (128 >> (position % 8))
-        else
-          @data[position / 8] ^= (128 >> (position % 8))
-        end
-      end
-    end
-
     def send_handshake
-      out = []
-      out << 19
-      out << "BitTorrent protocol"
-      out << [0, 0, 0, 0, 0, 0, 0, 0]
-      out << @environment[:torrent].info_hash
-      out << @environment[:peer_id]
+      buf = Buffer.new
+      buf.put_u8(19)
+      buf.put_string("BitTorrent protocol")
+      buf.put([0] * 8)
+      buf.put_string(@environment[:torrent].info_hash)
+      buf.put_string(@environment[:peer_id])
 
-      @socket.write out.flatten.pack('Ca19C8a20a20')
+      @socket.write buf.data
     end
 
     def recv_handshake
       pstrlen = @socket.readbyte
-      pstr = @socket.read pstrlen
-      reserved = @socket.read(8)
-      info_hash = @socket.read(20)
-      peer_id = @socket.read(20)
+      buf = Buffer.new(@socket.read(48 + pstrlen))
 
-      Message.new :handshake, pstr: pstr, reserved: reserved,
-        info_hash: info_hash, peer_id: peer_id
+      Message.new :handshake, pstr: buf.get_string(pstrlen),
+        reserved: buf.get(8), info_hash: buf.get(20), peer_id: buf.get(20)
     end
 
-    def send_message
+    def send_message(message)
+      buf = Buffer.new
+
+      case message.type
+      when :keep_alive
+        buf.put_u32(0)
+      when :choke
+        buf.put_u32(1)
+        buf.put_u8(0)
+      when :unchoke
+        buf.put_u32(1)
+        buf.put_u8(1)
+      when :interested
+        buf.put_u32(1)
+        buf.put_u8(2)
+      when :notinterested
+        buf.put_u32(1)
+        buf.put_u8(3)
+      when :have
+        buf.put_u32(5)
+        buf.put_u8(4)
+        buf.put_u32(message[:piece_index])
+      when :bitfield
+        # TODO
+      when :request
+        buf.put_u32(13)
+        buf.put_u8(6)
+        [:index, :begin, :length].each { |k| buf.put_u32(message.payload[k]) }
+      when :piece
+        # TODO
+      when :cancel
+        buf.put_u32(13)
+        buf.put_u8(8)
+        [:index, :begin, :length].each { |k| buf.put_u32(message.payload[k]) }
+      when :port
+        buf.put_u32(3)
+        buf.put_u8(9)
+        buf.put_u32(message[:listen_port])
+      end
+
+      @socket.write buf.data
     end
 
     def recv_message
-      len = @socket.readbyte
+      buf = Buffer.new(@socket.read(4))
+      len = buf.get_u32
+
+      buf.put_raw(@socket.read(len))
 
       if len == 0
         Message.new :keep_alive
       else
-        id = @socket.readbyte
+        id = buf.get_u8
 
         case id
         when 0
@@ -67,29 +89,19 @@ module Tubular
         when 3
           Message.new :not_interested
         when 4
-          Message.new :have, piece_index: w32
+          Message.new :have, piece_index: buf.get_u32
         when 5
-          Message.new :bitfield, bitfield: Bitfield.new(read(len - 1))
+          Message.new :bitfield, bitfield: Bitfield.new(buf.get(len - 1))
         when 6
-          Message.new :request, index: w32, begin: w32, length: w32
+          Message.new :request, index: buf.get_u32, begin: buf.get_u32, length: buf.get_u32
         when 7
-          Message.new :piece, index: w32, begin: w32, block: read(len - 9)
+          Message.new :piece, index: buf.get_u32, begin: buf.get_u32, block: buf.get(len - 9)
         when 8
-          Message.new :cancel, index: w32, begin: w32, length: w32
+          Message.new :cancel, index: buf.get_u32, begin: buf.get_u32, length: buf.get_u32
         when 9
-          Message.new :port, listen_port: w32
+          Message.new :port, listen_port: buf.get_u32
         end
       end
-    end
-
-    private
-
-    def read(len)
-      @socket.read(len)
-    end
-
-    def w32
-      @socket.read(4).unpack('N')[0]
     end
   end
 end
