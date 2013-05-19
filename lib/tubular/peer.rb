@@ -9,6 +9,10 @@ module Tubular
     include Celluloid
     # include Celluloid::IO
 
+    attr_reader :choked, :interested
+
+    attr_reader :am_choking, :am_interested
+
     def initialize(host, port, environment)
       @host, @port = host, port
       @environment = environment
@@ -43,21 +47,11 @@ module Tubular
       end
     end
 
-    # Whether or not we are currently interested in this peer.
-    def am_interested
-      @am_interested
-    end
-
     def am_interested=(interest)
       @am_interested = interest
       message_type = interest ? :interested : :notinterested
       message = Message.new(message_type)
       send_message(message)
-    end
-
-    # Whether or not we are currently choking this peer.
-    def am_choking
-      @am_choking
     end
 
     def am_choking=(choking)
