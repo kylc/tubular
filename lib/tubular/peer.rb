@@ -43,6 +43,12 @@ module Tubular
           @interested = false
         when :have
           @piece_map[message.payload[:piece_index]] = true
+        when :bitfield
+          @piece_map = message.payload[:bitfield]
+        when :request
+        when :piece
+        when :cancel
+        when :port
         end
       end
     end
