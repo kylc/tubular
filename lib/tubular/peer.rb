@@ -27,6 +27,10 @@ module Tubular
       send_handshake
       recv_handshake
 
+      async.run
+    end
+
+    def run
       loop do
         message = recv_message
 
