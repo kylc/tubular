@@ -7,7 +7,6 @@ module Tubular
   class Peer
     include Wire
     include Celluloid
-    # include Celluloid::IO
 
     attr_reader :choked, :interested
 
