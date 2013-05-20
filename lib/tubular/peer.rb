@@ -27,12 +27,17 @@ module Tubular
       @connection.async.connect
 
       every(30) do
-        @connection.send_message Wire::Message.new(:keep_alive)
+        if (Time.now - @last_message_time) >= 30
+          puts "SENDING KEEPALIVE"
+          @connection.send_message Wire::Message.new(:keep_alive)
+        end
       end
     end
 
     def handle(message)
       Tubular.logger.debug "Message: #{message}"
+
+      @last_message_time = Time.now
 
       case message.type
       when :keep_alive
