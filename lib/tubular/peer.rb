@@ -18,7 +18,8 @@ module Tubular
       @choked, @interested = true, false
       @am_choking, @am_interested = true, false
 
-      @connection = Connection.new(Actor.current, @host, @port, @environment)
+      # Link the connection so that, if it dies, the peer dies as well.
+      @connection = Connection.new_link(Actor.current, @host, @port, @environment)
 
       @piece_map = Bitfield.empty(@environment[:torrent].pieces.length)
     end
