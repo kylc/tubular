@@ -7,12 +7,22 @@ module Tubular
       Torrent.new(root)
     end
 
-    attr_reader :root
-
     def initialize(root)
       super.update(root)
 
       @digest = Digest::SHA1.new
+    end
+
+    def info
+      self['info']
+    end
+
+    def piece_length
+      info['piece length'].to_i
+    end
+
+    def pieces
+      info['pieces'].chars.each_slice(20).map(&:join)
     end
 
     def info_hash

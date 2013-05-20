@@ -19,6 +19,8 @@ module Tubular
       @am_choking, @am_interested = true, false
 
       @connection = Connection.new(Actor.current, @host, @port, @environment)
+
+      @piece_map = Bitfield.empty(@environment[:torrent].pieces.length)
     end
 
     def connect
@@ -46,6 +48,9 @@ module Tubular
       when :have
         @piece_map[message.payload[:piece_index]] = true
       when :bitfield
+        # TODO: Technically this is only allowed immediately following the
+        # handshake...  after any other messages are sent a bitfield can no
+        # longer be sent.
         @piece_map = message.payload[:bitfield]
       when :request
       when :piece
