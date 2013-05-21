@@ -21,6 +21,9 @@ module Tubular
       # Link the connection so that, if it dies, the peer dies as well.
       @connection = Connection.new_link(Actor.current, @host, @port, @environment)
 
+      # Initially we know nothing about which pieces thie peer has.  The other
+      # peer will inform us either by a bitfield message or by a series of have
+      # messages.
       @piece_map = Bitfield.empty(@environment[:torrent].pieces.length)
     end
 
