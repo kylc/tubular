@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+options = {}
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: tubular <file.torrent>"
+end
+optparse.parse!
+
+if ARGV.length == 1
+  # Require only if necessary to avoid Celluloid startup
+  require_relative '../lib/tubular'
+
+  torrent_file = ARGV.last
+  Tubular.download(torrent_file)
+else
+  $stderr.puts optparse.banner
+end

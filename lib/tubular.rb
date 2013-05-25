@@ -38,5 +38,3 @@ module Tubular
     sleep
   end
 end
-
-Tubular::download('ubuntu.torrent')
