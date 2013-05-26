@@ -81,6 +81,12 @@ module Tubular
       message = Wire::Message.new(message_type)
       @connection.send_message(message)
     end
+
+    # Download a block.
+    def request(index, start, length)
+      req = Wire::Message.new(:request, index: index, begin: start, length: length)
+      @connection.send_messasge req
+    end
   end
 
   class Connection
