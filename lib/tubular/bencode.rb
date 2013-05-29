@@ -45,12 +45,12 @@ module Tubular
       end
 
       def parse_int(io)
-        num = io.gets('e').chop.to_i
+        io.gets('e').chop.to_i
       end
 
       def parse_string(io)
         length = io.gets(':').to_i
-        value = io.read(length)
+        io.read(length)
       end
 
       def parse_list(io)
