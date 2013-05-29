@@ -34,6 +34,17 @@ module Tubular
       conn.async.connect
     end
 
+    # TODO: Orchestrate piece downloading.
+    # Strategy:
+    #
+    # Order pieces by scarcity
+    # 
+    # Shift pieces off the queue
+    #
+    # Find a suitable peer
+    #
+    # Request the piece (of multiple blocks)
+
     # Sleep forever!
     sleep
   end
