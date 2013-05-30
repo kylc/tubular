@@ -30,6 +30,11 @@ module Tubular
     def connect
       @connection.async.connect
 
+      after(5) do
+        puts "Sending interested"
+        self.am_interested = true
+      end
+
       every(30) do
         if (Time.now - @last_message_time) >= 30
           puts "SENDING KEEPALIVE"
