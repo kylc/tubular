@@ -95,7 +95,7 @@ module Tubular
   end
 
   class Connection
-    include Celluloid
+    include Celluloid::IO
     include Wire
 
     def initialize(sink, host, port, environment)
@@ -110,7 +110,7 @@ module Tubular
       send_handshake
       recv_handshake
 
-      run
+      async.run
     end
 
     def run

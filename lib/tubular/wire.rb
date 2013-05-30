@@ -18,7 +18,7 @@ module Tubular
     end
 
     def recv_handshake
-      pstrlen = @socket.readbyte
+      pstrlen = @socket.readpartial(1).unpack('C')[0]
       buf = Buffer.new(@socket.read(48 + pstrlen))
 
       Message.new :handshake, pstr: buf.get_string(pstrlen),
