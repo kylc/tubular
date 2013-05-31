@@ -31,12 +31,9 @@ module Tubular
     end
 
     def connect
-      @connection.async.connect
+      @connection.connect
 
-      after(5) do
-        puts "Sending interested"
-        self.am_interested = true
-      end
+      self.am_interested = true
 
       every(30) do
         if (Time.now - @last_message_time) >= 30
