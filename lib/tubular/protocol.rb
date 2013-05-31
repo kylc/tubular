@@ -2,7 +2,7 @@ require_relative 'bitfield'
 require_relative 'buffer' 
 
 module Tubular
-  module Wire
+  module Protocol
     class Message < Struct.new(:type, :payload)
     end
 

@@ -1,7 +1,7 @@
 require 'celluloid/autostart'
 require 'celluloid/io'
 
-require_relative 'wire'
+require_relative 'protocol'
 
 module Tubular
   class Peer
@@ -40,8 +40,8 @@ module Tubular
 
       every(30) do
         if (Time.now - @last_message_time) >= 30
-          puts "SENDING KEEPALIVE"
-          @connection.send_message Wire::Message.new(:keep_alive)
+          Tubular.logger.debug "Sending keepalive"
+          @connection.send_message Protocol::Message.new(:keep_alive)
         end
       end
     end
@@ -53,7 +53,7 @@ module Tubular
 
       case message.type
       when :keep_alive
-        @connection.send_message Wire::Message.new(:keep_alive)
+        @connection.send_message Protocol::Message.new(:keep_alive)
       when :choke
         @choked = true
       when :unchoke
@@ -119,7 +119,7 @@ module Tubular
           length = remaining
         end
 
-        req = Wire::Message.new(:request, index: index, begin: start, length: length)
+        req = Protocol::Message.new(:request, index: index, begin: start, length: length)
         @request_queue << req
 
         start += length
@@ -132,7 +132,7 @@ module Tubular
 
   class Connection
     include Celluloid::IO
-    include Wire
+    include Protocol
 
     def initialize(sink, host, port, environment)
       @sink = sink
