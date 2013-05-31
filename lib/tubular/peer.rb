@@ -9,6 +9,7 @@ module Tubular
 
     attr_reader :choked, :interested
 
+    attr_reader :choked, :interested
     attr_reader :am_choking, :am_interested
 
     def initialize(host, port, environment)
