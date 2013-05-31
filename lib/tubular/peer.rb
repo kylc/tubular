@@ -7,7 +7,7 @@ module Tubular
   class Peer
     include Celluloid
 
-    attr_reader :choked, :interested
+    REQUEST_LENGTH = 2 ** 14 # 16KB
 
     attr_reader :choked, :interested
     attr_reader :am_choking, :am_interested
@@ -26,6 +26,8 @@ module Tubular
       # peer will inform us either by a bitfield message or by a series of have
       # messages.
       @piece_map = Bitfield.empty(@environment[:torrent].pieces.length)
+
+      @request_queue = []
     end
 
     def connect
@@ -56,6 +58,13 @@ module Tubular
         @choked = true
       when :unchoke
         @choked = false
+
+        # Once we are unchoked, immediately request a piece.
+        # TODO: Actually get pieces we want...
+        request_piece(0)
+        if req = @request_queue.shift
+          @connection.send_message(req)
+        end
       when :interested
         @interested = true
       when :notinterested
@@ -69,6 +78,9 @@ module Tubular
         @piece_map = message.payload[:bitfield]
       when :request
       when :piece
+        if req = @request_queue.shift
+          @connection.send_message(req)
+        end
       when :cancel
       when :port
       end
@@ -91,7 +103,30 @@ module Tubular
     # Download a block.
     def request(index, start, length)
       req = Wire::Message.new(:request, index: index, begin: start, length: length)
-      @connection.send_messasge req
+      @connection.send_message(req)
+    end
+
+    def request_piece(index)
+      remaining = @environment[:torrent].piece_length
+      start = 0
+
+      # TODO: Don't do this in a stupid way.
+      loop do
+        length = REQUEST_LENGTH
+
+        # If we're requesting the last block of a piece
+        if length > remaining
+          length = remaining
+        end
+
+        req = Wire::Message.new(:request, index: index, begin: start, length: length)
+        @request_queue << req
+
+        start += length
+        remaining -= length
+
+        break unless remaining > 0
+      end
     end
   end
 
