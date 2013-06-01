@@ -44,7 +44,9 @@ module Tubular
     end
 
     def handle(message)
-      Tubular.logger.debug "Message: #{message}"
+      if message.type != :piece
+        Tubular.logger.debug "Message: #{message}"
+      end
 
       @last_message_time = Time.now
 
@@ -75,6 +77,7 @@ module Tubular
         @piece_map = message.payload[:bitfield]
       when :request
       when :piece
+        Tubular.logger.debug "Got piece index=#{message.payload[:index]} begin=#{message.payload[:begin]}"
         if req = @request_queue.shift
           @connection.send_message(req)
         end
