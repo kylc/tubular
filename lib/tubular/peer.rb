@@ -100,12 +100,6 @@ module Tubular
       @connection.send_message(message)
     end
 
-    # Download a block.
-    def request(index, start, length)
-      req = Wire::Message.new(:request, index: index, begin: start, length: length)
-      @connection.send_message(req)
-    end
-
     def request_piece(index)
       remaining = @environment[:torrent].piece_length
       start = 0
