@@ -89,14 +89,14 @@ module Tubular
     def am_interested=(interest)
       @am_interested = interest
       message_type = interest ? :interested : :notinterested
-      message = Wire::Message.new(message_type)
+      message = Protocol::Message.new(message_type)
       @connection.send_message(message)
     end
 
     def am_choking=(choking)
       @am_choking = choking
       message_type = choking ? :choke : :unchoke
-      message = Wire::Message.new(message_type)
+      message = Protocol::Message.new(message_type)
       @connection.send_message(message)
     end
 
