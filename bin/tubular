@@ -10,7 +10,7 @@ optparse.parse!
 
 if ARGV.length == 1
   # Require only if necessary to avoid Celluloid startup
-  require_relative '../lib/tubular'
+  require 'tubular'
 
   torrent_file = ARGV.last
   Tubular.download(torrent_file)

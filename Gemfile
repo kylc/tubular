@@ -1,6 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'minitest'
-gem 'webmock'
-gem 'celluloid'
-gem 'celluloid-io'
+# Specify your gem's dependencies in tubular.gemspec
+gemspec

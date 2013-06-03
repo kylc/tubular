@@ -1,9 +1,10 @@
 require 'logger'
 
-require_relative 'tubular/bencode'
-require_relative 'tubular/torrent'
-require_relative 'tubular/tracker'
-require_relative 'tubular/peer'
+require 'tubular/bencode'
+require 'tubular/torrent'
+require 'tubular/tracker'
+require 'tubular/peer'
+require 'tubular/version'
 
 module Tubular
   def self.logger

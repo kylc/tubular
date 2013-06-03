@@ -1,7 +1,7 @@
 require 'celluloid/autostart'
 require 'celluloid/io'
 
-require_relative 'protocol'
+require 'tubular/protocol'
 
 module Tubular
   class Peer

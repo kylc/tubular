@@ -1,5 +1,5 @@
-require_relative 'bitfield' 
-require_relative 'buffer' 
+require 'tubular/bitfield'
+require 'tubular/buffer'
 
 module Tubular
   module Protocol
