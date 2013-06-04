@@ -76,13 +76,16 @@ module Tubular
         # longer be sent.
         @piece_map = message.payload[:bitfield]
       when :request
+        # TODO: Implement
       when :piece
         Tubular.logger.debug "Got piece index=#{message.payload[:index]} begin=#{message.payload[:begin]}"
         if req = @request_queue.shift
           @connection.send_message(req)
         end
       when :cancel
+        # TODO: Implement
       when :port
+        # TODO: Implement
       end
     end
 
