@@ -109,7 +109,7 @@ module Tubular
 
       # TODO: Don't do this in a stupid way.
       loop do
-        length = REQUEST_LENGTH
+        length = Tubular::REQUEST_LENGTH
 
         # If we're requesting the last block of a piece
         if length > remaining
