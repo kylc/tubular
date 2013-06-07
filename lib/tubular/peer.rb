@@ -7,8 +7,6 @@ module Tubular
   class Peer
     include Celluloid
 
-    REQUEST_LENGTH = 2 ** 14 # 16KB
-
     attr_reader :choked, :interested
     attr_reader :am_choking, :am_interested
 
