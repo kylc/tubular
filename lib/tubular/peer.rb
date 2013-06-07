@@ -20,11 +20,13 @@ module Tubular
       # Link the connection so that, if it dies, the peer dies as well.
       @connection = Connection.new_link(Actor.current, @host, @port, @environment)
 
-      # Initially we know nothing about which pieces thie peer has.  The other
+      # Initially we know nothing about which pieces the peer has.  The other
       # peer will inform us either by a bitfield message or by a series of have
       # messages.
       @piece_map = Bitfield.empty(@environment[:torrent].pieces.length)
 
+      # Queue of request messages to send to the peer. These are all generated
+      # at once, but sent sequentially after each block is received.
       @request_queue = []
     end
 
@@ -77,6 +79,8 @@ module Tubular
         # TODO: Implement
       when :piece
         Tubular.logger.debug "Got piece index=#{message.payload[:index]} begin=#{message.payload[:begin]}"
+
+        # Once we receive a piece, request the next one
         if req = @request_queue.shift
           @connection.send_message(req)
         end
