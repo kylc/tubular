@@ -3,7 +3,7 @@ module Tubular
       attr_reader :length
 
       def self.empty(length_in_bits)
-        bytes = (length_in_bits / 8.0).ceil
+        bytes = (length_in_bits + 7) / 8
         data = ([0] * bytes).pack('C*')
         Bitfield.new(data)
       end
