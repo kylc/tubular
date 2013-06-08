@@ -2,6 +2,7 @@ require 'logger'
 
 require 'tubular/constant'
 require 'tubular/bencode'
+require 'tubular/environment'
 require 'tubular/torrent'
 require 'tubular/tracker'
 require 'tubular/peer'
@@ -16,16 +17,15 @@ module Tubular
     # Open the torrent file
     torrent = Torrent.open(torrent_file)
 
-    environment = {
-      torrent: torrent,
-      peer_id: "-TB0000-" + (1..12).map { rand(9) }.join
-    }
+    environment = Environment.new
+    environment.torrent = torrent
+    environment.peer_id = "-TB0000-" + (1..12).map { rand(9) }.join
 
     # Ask the tracker for peers
     tracker = Tracker::Tracker.new(environment)
     resp = tracker.perform
 
-    environment[:tracker] = tracker
+    environment.tracker = tracker
 
     # Connect to the peers
     # TODO: Should select peers in a more intelligent manner

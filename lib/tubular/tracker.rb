@@ -21,8 +21,8 @@ module Tubular
       def initialize(environment, params={})
         @environment = environment
         @params = DEFAULT_PARAMS.merge(params)
-        @params[:peer_id] = environment[:peer_id]
-        @params[:info_hash] = environment[:torrent].info_hash
+        @params[:peer_id] = environment.peer_id
+        @params[:info_hash] = environment.torrent.info_hash
       end
 
       def perform
@@ -34,7 +34,7 @@ module Tubular
       private
 
       def request_url
-        url = URI(@environment[:torrent]['announce'])
+        url = URI(@environment.torrent['announce'])
         url.query = URI.encode_www_form(@params)
         url
       end

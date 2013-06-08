@@ -23,7 +23,7 @@ module Tubular
       # Initially we know nothing about which pieces the peer has.  The other
       # peer will inform us either by a bitfield message or by a series of have
       # messages.
-      @piece_map = Bitfield.empty(@environment[:torrent].pieces.length)
+      @piece_map = Bitfield.empty(@environment.torrent.pieces.length)
 
       # Queue of request messages to send to the peer. These are all generated
       # at once, but sent sequentially after each block is received.
@@ -106,7 +106,7 @@ module Tubular
     end
 
     def request_piece(index)
-      piece_length = @environment[:torrent].piece_length
+      piece_length = @environment.torrent.piece_length
 
       num_blocks = (piece_length + REQUEST_LENGTH - 1) / REQUEST_LENGTH
       (0..(num_blocks - 1)).each do |idx|
