@@ -22,7 +22,7 @@ module Tubular
     environment.peer_id = "-TB0000-" + (1..12).map { rand(9) }.join
 
     # Ask the tracker for peers
-    tracker = Tracker::Tracker.new(environment)
+    tracker = Tracker.new(environment)
     resp = tracker.perform
 
     environment.tracker = tracker
