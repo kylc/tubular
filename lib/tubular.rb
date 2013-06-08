@@ -18,7 +18,7 @@ module Tubular
 
     environment = {
       torrent: torrent,
-      peer_id: "aaaaaaaaaaaaaaaaaaaa"
+      peer_id: "-TB0000-" + (1..12).map { rand(9) }.join
     }
 
     # Ask the tracker for peers
