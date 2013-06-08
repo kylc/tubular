@@ -106,25 +106,19 @@ module Tubular
     end
 
     def request_piece(index)
-      remaining = @environment[:torrent].piece_length
-      start = 0
+      piece_length = @environment[:torrent].piece_length
 
-      # TODO: Don't do this in a stupid way.
-      loop do
-        length = Tubular::REQUEST_LENGTH
+      num_blocks = (piece_length + REQUEST_LENGTH - 1) / REQUEST_LENGTH
+      (0..(num_blocks - 1)).each do |idx|
+        start = idx * REQUEST_LENGTH
 
-        # If we're requesting the last block of a piece
-        if length > remaining
-          length = remaining
+        length = REQUEST_LENGTH
+        if start + length > piece_length
+          length = piece_length - start
         end
 
         req = Protocol::Message.new(:request, index: index, begin: start, length: length)
         @request_queue << req
-
-        start += length
-        remaining -= length
-
-        break unless remaining > 0
       end
     end
   end
