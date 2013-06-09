@@ -6,6 +6,7 @@ require 'tubular/environment'
 require 'tubular/torrent'
 require 'tubular/tracker'
 require 'tubular/peer'
+require 'tubular/local'
 require 'tubular/version'
 
 module Tubular
