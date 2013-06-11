@@ -28,13 +28,20 @@ module Tubular
 
     environment.tracker = tracker
 
+    local = LocalFile.new(environment.torrent.pieces.count)
+    environment.local = local
+
     # Connect to the peers
     # TODO: Should select peers in a more intelligent manner
-    resp.peers.take(2).each do |peer|
+    resp.peers.shuffle.take(1).each do |peer|
       logger.debug "Connecting to #{peer}"
 
       conn = Peer.new(peer[:host], peer[:port], environment)
       conn.async.connect
+
+      environment.torrent.pieces.each_with_index do |piece, idx|
+        conn.request_piece(idx)
+      end
     end
 
     # TODO: Orchestrate piece downloading.

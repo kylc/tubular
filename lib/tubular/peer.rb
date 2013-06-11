@@ -28,6 +28,9 @@ module Tubular
       # Queue of request messages to send to the peer. These are all generated
       # at once, but sent sequentially after each block is received.
       @request_queue = []
+
+      # A list of blocks we have gathered to build the current piece.
+      @piece_buffer = []
     end
 
     def connect
@@ -59,8 +62,6 @@ module Tubular
         @choked = false
 
         # Once we are unchoked, immediately request a piece.
-        # TODO: Actually get pieces we want...
-        request_piece(0)
         if req = @request_queue.shift
           @connection.send_message(req)
         end
@@ -77,8 +78,18 @@ module Tubular
         @piece_map = message.payload[:bitfield]
       when :request
         # TODO: Implement
-      when :piece
+      when :piece # :block
         Tubular.logger.debug "Got piece index=#{message.payload[:index]} begin=#{message.payload[:begin]}"
+
+        @piece_buffer << message
+
+        if piece_buffer_full?
+          # Write the piece locally
+          index = message.payload[:index]
+          offset = index * @environment.torrent.piece_length
+          @environment.local.write(index, offset, @piece_buffer.map { |m| m.payload[:block] })
+          @piece_buffer = []
+        end
 
         # Once we receive a piece, request the next one
         if req = @request_queue.shift
@@ -120,6 +131,12 @@ module Tubular
         req = Protocol::Message.new(:request, index: index, begin: start, length: length)
         @request_queue << req
       end
+    end
+
+    def piece_buffer_full?
+      piece_length = @environment.torrent.piece_length
+
+      @piece_buffer.length * REQUEST_LENGTH >= piece_length
     end
   end
 
