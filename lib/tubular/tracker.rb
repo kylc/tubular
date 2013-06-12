@@ -20,7 +20,7 @@ module Tubular
     def initialize(environment, params={})
       @environment = environment
       @params = DEFAULT_PARAMS.merge(params)
-      @params[:peer_id] = environment.peer_id
+      @params[:peer_id] = Tubular.peer_id
       @params[:info_hash] = environment.torrent.info_hash
     end
 

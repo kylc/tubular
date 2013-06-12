@@ -14,13 +14,16 @@ module Tubular
     @logger ||= Logger.new(STDOUT)
   end
 
+  def self.peer_id
+    @peer_id ||= "-TB0000-" + (1..12).map { rand(9) }.join
+  end
+
   def self.download(torrent_file)
     # Open the torrent file
     torrent = Torrent.open(torrent_file)
 
     environment = Environment.new
     environment.torrent = torrent
-    environment.peer_id = "-TB0000-" + (1..12).map { rand(9) }.join
 
     # Ask the tracker for peers
     tracker = Tracker.new(environment)

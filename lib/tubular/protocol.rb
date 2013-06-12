@@ -12,7 +12,7 @@ module Tubular
       buf.put_string("BitTorrent protocol")
       buf.put([0] * 8)
       buf.put_string(@environment.torrent.info_hash)
-      buf.put_string(@environment.peer_id)
+      buf.put_string(Tubular.peer_id)
 
       @socket.write buf.data
     end
