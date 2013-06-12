@@ -10,20 +10,19 @@ module Tubular
     attr_reader :choked, :interested
     attr_reader :am_choking, :am_interested
 
-    def initialize(host, port, environment)
+    def initialize(host, port)
       @host, @port = host, port
-      @environment = environment
 
       @choked, @interested = true, false
       @am_choking, @am_interested = true, false
 
       # Link the connection so that, if it dies, the peer dies as well.
-      @connection = Connection.new_link(Actor.current, @host, @port, @environment)
+      @connection = Connection.new_link(Actor.current, @host, @port)
 
       # Initially we know nothing about which pieces the peer has.  The other
       # peer will inform us either by a bitfield message or by a series of have
       # messages.
-      @piece_map = Bitfield.empty(@environment.torrent.pieces.length)
+      @piece_map = Bitfield.empty(Tubular.torrent.pieces.length)
 
       # Queue of request messages to send to the peer. These are all generated
       # at once, but sent sequentially after each block is received.
@@ -86,8 +85,8 @@ module Tubular
         if piece_buffer_full?
           # Write the piece locally
           index = message.payload[:index]
-          offset = index * @environment.torrent.piece_length
-          @environment.local.write(index, offset, @piece_buffer.map { |m| m.payload[:block] })
+          offset = index * Tubular.torrent.piece_length
+          Tubular.local.write(index, offset, @piece_buffer.map { |m| m.payload[:block] })
           @piece_buffer = []
         end
 
@@ -117,7 +116,7 @@ module Tubular
     end
 
     def request_piece(index)
-      piece_length = @environment.torrent.piece_length
+      piece_length = Tubular.torrent.piece_length
 
       num_blocks = (piece_length + REQUEST_LENGTH - 1) / REQUEST_LENGTH
       (0..(num_blocks - 1)).each do |idx|
@@ -134,7 +133,7 @@ module Tubular
     end
 
     def piece_buffer_full?
-      piece_length = @environment.torrent.piece_length
+      piece_length = Tubular.torrent.piece_length
 
       @piece_buffer.length * REQUEST_LENGTH >= piece_length
     end
@@ -144,10 +143,9 @@ module Tubular
     include Celluloid::IO
     include Protocol
 
-    def initialize(sink, host, port, environment)
+    def initialize(sink, host, port)
       @sink = sink
       @host, @port = host, port
-      @environment = environment
     end
 
     def connect

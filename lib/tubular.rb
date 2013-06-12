@@ -2,7 +2,6 @@ require 'logger'
 
 require 'tubular/constant'
 require 'tubular/bencode'
-require 'tubular/environment'
 require 'tubular/torrent'
 require 'tubular/tracker'
 require 'tubular/peer'
@@ -18,31 +17,37 @@ module Tubular
     @peer_id ||= "-TB0000-" + (1..12).map { rand(9) }.join
   end
 
+  def self.tracker
+    @tracker
+  end
+
+  def self.torrent
+    @torrent
+  end
+
+  def self.local
+    @local
+  end
+
   def self.download(torrent_file)
     # Open the torrent file
-    torrent = Torrent.open(torrent_file)
-
-    environment = Environment.new
-    environment.torrent = torrent
+    @torrent = Torrent.open(torrent_file)
 
     # Ask the tracker for peers
-    tracker = Tracker.new(environment)
+    @tracker = Tracker.new
     resp = tracker.perform
 
-    environment.tracker = tracker
-
-    local = LocalFile.new(environment.torrent.pieces.count)
-    environment.local = local
+    @local = LocalFile.new(@torrent.pieces.count)
 
     # Connect to the peers
     # TODO: Should select peers in a more intelligent manner
     resp.peers.shuffle.take(1).each do |peer|
       logger.debug "Connecting to #{peer}"
 
-      conn = Peer.new(peer[:host], peer[:port], environment)
+      conn = Peer.new(peer[:host], peer[:port])
       conn.async.connect
 
-      environment.torrent.pieces.each_with_index do |piece, idx|
+      @torrent.pieces.each_with_index do |piece, idx|
         conn.request_piece(idx)
       end
     end

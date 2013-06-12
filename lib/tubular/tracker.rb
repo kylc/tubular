@@ -17,11 +17,10 @@ module Tubular
 
     attr_reader :torrent, :params
 
-    def initialize(environment, params={})
-      @environment = environment
+    def initialize(params={})
       @params = DEFAULT_PARAMS.merge(params)
       @params[:peer_id] = Tubular.peer_id
-      @params[:info_hash] = environment.torrent.info_hash
+      @params[:info_hash] = Tubular.torrent.info_hash
     end
 
     def perform
@@ -33,7 +32,7 @@ module Tubular
     private
 
     def request_url
-      url = URI(@environment.torrent['announce'])
+      url = URI(Tubular.torrent['announce'])
       url.query = URI.encode_www_form(@params)
       url
     end
