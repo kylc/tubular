@@ -1,8 +1,3 @@
-require 'celluloid/autostart'
-require 'celluloid/io'
-
-require 'tubular/protocol'
-
 module Tubular
   class Peer
     include Celluloid

@@ -1,6 +1,3 @@
-require 'tubular/bitfield'
-require 'tubular/buffer'
-
 module Tubular
   module Protocol
     class Message < Struct.new(:type, :payload)

@@ -1,5 +1,3 @@
-require 'stringio'
-
 module Tubular
   class Bencode 
     class << self

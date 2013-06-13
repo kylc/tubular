@@ -1,6 +1,3 @@
-require 'net/http'
-require 'uri'
-
 module Tubular
   class Tracker
     DEFAULT_PARAMS = {
