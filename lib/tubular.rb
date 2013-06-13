@@ -13,6 +13,7 @@ module Tubular
     @logger ||= Logger.new(STDOUT)
   end
 
+  # A 20 character identifier for this client and peer.
   def self.peer_id
     @peer_id ||= "-TB0000-" + (1..12).map { rand(9) }.join
   end

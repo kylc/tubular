@@ -130,6 +130,8 @@ module Tubular
         req = Protocol::Message.new(:request, index: index, begin: start, length: length)
         @request_queue << req
       end
+
+      # TODO: If nothing else is in the queue, we can immediately
     end
 
     def piece_buffer_full?
