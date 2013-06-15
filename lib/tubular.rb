@@ -10,6 +10,7 @@ require 'celluloid/io'
 require 'tubular/bitfield'
 require 'tubular/buffer'
 require 'tubular/constant'
+require 'tubular/controller'
 require 'tubular/bencode'
 require 'tubular/torrent'
 require 'tubular/tracker'
@@ -50,18 +51,8 @@ module Tubular
 
     @local = LocalFile.new(@torrent.pieces.count)
 
-    # Connect to the peers
-    # TODO: Should select peers in a more intelligent manner
-    resp.peers.shuffle.take(1).each do |peer|
-      logger.debug "Connecting to #{peer}"
-
-      conn = Peer.new(peer[:host], peer[:port])
-      conn.async.connect
-
-      @torrent.pieces.each_with_index do |piece, idx|
-        conn.request_piece(idx)
-      end
-    end
+    @controller = Controller.new
+    @controller.refresh
 
     # TODO: Orchestrate piece downloading.
     # Strategy:
@@ -76,5 +67,18 @@ module Tubular
 
     # Sleep forever!
     sleep
+  end
+
+  # Connect to a random peer from the tracker's cached response.
+  def self.connect_to_peer!
+    # Grab a random peer from the last tracker response
+    peer = @tracker.cached_response.peers.shuffle.delete_at(0)
+
+    logger.debug "Connecting to #{peer}"
+
+    conn = Peer.new(peer[:host], peer[:port])
+    conn.async.connect
+
+    peer
   end
 end
