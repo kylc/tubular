@@ -14,6 +14,9 @@ module Tubular
 
     attr_reader :torrent, :params
 
+    # The result of the last request.
+    attr_reader :cached_response
+
     def initialize(params={})
       @params = DEFAULT_PARAMS.merge(params)
       @params[:peer_id] = Tubular.peer_id
@@ -23,7 +26,7 @@ module Tubular
     def perform
       resp = Net::HTTP.get_response(request_url)
 
-      Response.new(Bencode::parse_from_string(resp.body))
+      @cached_response = Response.new(Bencode::parse_from_string(resp.body))
     end
 
     private
