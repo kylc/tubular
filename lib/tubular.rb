@@ -1,5 +1,6 @@
 require 'logger'
 
+require 'tubular/constant'
 require 'tubular/bencode'
 require 'tubular/torrent'
 require 'tubular/tracker'
